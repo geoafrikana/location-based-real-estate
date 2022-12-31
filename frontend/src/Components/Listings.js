@@ -1,17 +1,24 @@
-import { Grid,styled, AppBar, Typography, Button, Card, CardHeader, CardMedia, CardContent, CardActions} from '@mui/material'
-import React, {useState} from 'react'
+import { Grid,styled, AppBar, Typography, Button, Card, CardHeader, CardMedia, CardContent, CardActions, CircularProgress} from '@mui/material'
+import React, {useState, useEffect} from 'react'
 import { MapContainer, TileLayer,
          Marker, Popup } from 'react-leaflet'
 import { Icon } from 'leaflet'
+import Axios from 'axios';
 
 import homeIconPng from '../Assets/Mapicons/house.png'
 import apartmentIconPng from '../Assets/Mapicons/apartment.png'
 import officeIconPng from '../Assets/Mapicons/office.png'
-import img1 from '../Assets/img1.jpg';
-import myListings from '../Assets/Data/Dummydata';
+// import img1 from '../Assets/img1.jpg';
+// import myListings from '../Assets/Data/Dummydata';
+
 
 function Listings() {
-  const StyledCard = styled(Card)({
+//   fetch('http://127.0.0.1:8000/api/listings')
+//   .then(response=>response.json())
+//   .then(data=>console.log(data))
+  
+
+const StyledCard = styled(Card)({
 margin: '0.5rem',
 border:'1px solid black',
 position: 'relative'
@@ -51,12 +58,45 @@ position: 'relative'
     iconSize: [40,40],
   })
 
-  
+const [allListings, setAllListings] = useState([])
+const [dataIsLoading, setDataIsLoading] = useState(true)
+
+useEffect(()=>{
+const source = Axios.CancelToken.source();
+  async function GetAllListings(){
+    try {
+    const response = await Axios.get(
+      'http://localhost:8000/api/listings/', {
+      cancelToken: source.token});
+
+    setAllListings(response.data);
+    setDataIsLoading(false);
+  } catch (error){
+  console.log(error.response)
+}
+}
+GetAllListings();
+return ()=>{
+source.cancel()
+};
+}, []);
+
+if(!dataIsLoading){
+  console.log(allListings[0].location)
+}
+
+if(dataIsLoading){
+  return(
+<Grid container justifyContent="center" alignItems="center" style={{height:'100vh'}}>
+<CircularProgress />
+</Grid>
+  ) 
+}
   return (
     
     <Grid container>
 <Grid item xs={4} >
-{myListings.map(listing=>{
+{allListings.map(listing=>{
   return(
     <StyledCard key={listing.id}>
       <CardHeader
@@ -104,7 +144,7 @@ position: 'relative'
    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
   />
 
-  {myListings.map((listing)=>{
+  {allListings.map((listing)=>{
     const iconDisplay =()=>{
       if(listing.listing_type === 'House'){
         return houseIcon

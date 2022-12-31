@@ -6,6 +6,8 @@ import Login from './Components/Login';
 import Listings from './Components/Listings';
 import { CssBaseline} from '@mui/material';
 import NavBar from './Components/NavBar';
+import Testing from './Components/Testing';
+import Register from './Components/Register';
 
 function App() {
   return (
@@ -16,7 +18,9 @@ function App() {
       
       <Route path="/" element= {<Home />}/>
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
       <Route path="/listings" element={<Listings />} />
+      <Route path="/testing" element= {<Testing />}/>
     </Routes>
     </BrowserRouter>
   );
